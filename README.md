@@ -1,2 +1,2 @@
-# ECBMentionExtractor
-Extracts Cross Document Mentions to BIUNLP Mention Format
+# Cross Document Mention Extractor
+Extracts Cross Document Mentions to BIU NLP Lab Mention Format for Evaluating Co-refernce Systems
