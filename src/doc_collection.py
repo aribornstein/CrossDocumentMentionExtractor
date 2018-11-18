@@ -14,17 +14,17 @@ class DocumentCollection:
         A DocumentCollection is a base class that contains a list 
         of documents and a unique collection_id
         """
-        def __init__(self, collection_id, documents):
+        def __init__(self, collection_id):
                 self.collection_id = collection_id
-                self.documents = documents
+                self.documents = []
 
-        def add_doc(document):
+        def add_doc(self, document):
                 """
                 Add document to collection
                 """
                 self.documents.append(document)
 
-        def remove_doc(doc_id):
+        def remove_doc(self, doc_id):
                 """
                 Removes document with a given id from collection
                 """

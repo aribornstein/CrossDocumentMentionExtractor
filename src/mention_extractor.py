@@ -1,7 +1,10 @@
 """
+Written By Ari Bornstein
 """
+import os, json
+from doc_collection import DocumentCollection
+from tqdm import tqdm
 
-from doc_collection import Collection, DocumentCollection
 
 class Mentions:
         """
@@ -10,6 +13,18 @@ class Mentions:
         def __init__(self):
                 self.entity_mentions = []
                 self.event_mentions = []
+
+        def save_json(self, outpath, base_name='mentions'):
+                """
+                Extracts mentions to json saves to outpath
+                """             
+                entity_path = os.path.join(outpath, 'entity_{}.json'.format(base_name))
+                event_path = os.path.join(outpath, 'event_{}.json'.format(base_name))
+                with open(entity_path, 'w') as outfile:
+                        json.dump(self.entity_mentions, outfile)
+                with open(event_path, 'w') as outfile:
+                        json.dump(self.event_mentions, outfile)
+
 
 class MentionExtractor:
         """
@@ -25,7 +40,7 @@ class MentionExtractor:
                 document collection. 
                 """
                 mentions = Mentions()
-                for col in collections:
+                for col in tqdm(collections):
                         for doc in col.documents:
                                 if entity:
                                         mentions.entity_mentions += self._extract_enitiy_mentions(col.collection_id,
@@ -79,6 +94,13 @@ class MentionExtractor:
                 }
                 """
                 raise Exception("Not yet implemented")
+
+        def export_json(export_dir):
+                """
+                Exports to mentions to to export dir
+                """
+                raise Exception("Not yet implemented")
+
 
 
 
