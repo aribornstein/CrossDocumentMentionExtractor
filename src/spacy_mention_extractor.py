@@ -8,6 +8,8 @@ from mention_extractor import MentionExtractor, Mentions
 from doc_collection import DocumentCollection
 from tqdm import tqdm
 
+verb_ignore_list = set(["be", "am", "are", "is", "are", "was", "were", "will", "be", "being", "been", "has", "have", "had"])
+
 class SpacyMentionExtractor(MentionExtractor):
         """
         A spacy implementaion of the mention extractor
@@ -41,14 +43,16 @@ class SpacyMentionExtractor(MentionExtractor):
                 """
                 mentions = []
                 for chunk in doc_text.noun_chunks:
+                        if chunk.root.pos_ != 'PRON':
                         # extract entity 
-                        mention = {\
-                                "topic_id": collection_id, #Required (a topic is a set of multiple documents that share the same subject)
-                                "doc_id": doc_id, #Required (the article or document id this mention belong to)
-                                "tokens_number": [i+1 for i in range(chunk.start, chunk.end)],  #Optional (the token number in sentence, will be required when using Within doc entities)
-                                "tokens_str": chunk.text, #Required (the mention text)
-                        }
-                        mentions.append(mention)
+                                mention = {\
+                                        "topic_id": collection_id, #Required (a topic is a set of multiple documents that share the same subject)
+                                        "doc_id": doc_id, #Required (the article or document id this mention belong to)
+                                        "tokens_number": [i for i in range(chunk.start, chunk.end)],  #Optional (the token number in sentence, will be required when using Within doc entities)
+                                        "tokens_str": chunk.text, #Required (the mention text),
+                                        "root_tag": chunk.root.pos_
+                                }
+                                mentions.append(mention)
                 return mentions
 
         def _extract_event_mentions(self, collection_id, doc_id, doc_text):
@@ -58,11 +62,12 @@ class SpacyMentionExtractor(MentionExtractor):
                 mentions = []
                 for sent in doc_text.sents:
                     for possible_subject in sent:
-                        if possible_subject.dep == nsubj and possible_subject.head.pos == VERB:
+                        if possible_subject.dep == nsubj and possible_subject.head.pos == VERB and\
+                           possible_subject.head.text not in verb_ignore_list:
                                 mention = {\
                                 "topic_id": collection_id, #Required (a topic is a set of multiple documents that share the same subject)
                                 "doc_id": doc_id, #Required (the article or document id this mention belong to)
-                                "tokens_number": [i+1 for i in range(possible_subject.head.i, possible_subject.head.i - (sent.start + 1))],  #Optional (the token number in sentence, will be required when using Within doc entities)
+                                "tokens_number": [possible_subject.head.i],  #Optional (the token number in sentence, will be required when using Within doc entities)
                                 "tokens_str": possible_subject.head.text, #Required (the mention text)
                                 }
                                 mentions.append(mention)
